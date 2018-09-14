@@ -14,39 +14,29 @@ namespace ConsoleSearchAlbums
         static void Main(string[] args)
         {
             string search, response = string.Empty;
-            bool isValidSearchLength = false;
             IEnumerable<string> albums = null;
-
-            Console.OutputEncoding = Encoding.GetEncoding(1251);
 
             // Адрес ресурса, к которому выполняется запрос
             string url = "https://www.last.fm/ru/search/albums"; ;
-            Console.WriteLine("\nДобро пожаловать на last.fm.\n");
+            Console.WriteLine("Добро пожаловать на last.fm.\n");
             do
             {
-                do
-                {
-                    Console.WriteLine("Введите имя исполнителя для поиска альбомов:");
-                    search = Console.ReadLine();
-                    if (!(isValidSearchLength = search.Length >= 3))
-                        Console.WriteLine("Слишком короткое имя, поиск начинается с трех символов.");
-                } while (!isValidSearchLength);
+                Console.WriteLine("Введите имя исполнителя для поиска альбомов:");
+                search = Console.ReadLine();
 
-                Console.WriteLine("Выполняется поиск...");
-
+                Console.WriteLine("Выполняется поиск...\n");
                 response = Get(url, search);
 
                 var parser = new AlbumParser();
                 albums = parser.Search(response);
 
-                Console.WriteLine($"Результат поиска \"{search}\":");
+                Console.WriteLine($"Результат поиска \"{search}\":\n");
                 foreach (var item in albums)
                 {
                     Console.WriteLine(item);
                 }
-                Console.WriteLine();
 
-                Console.Write("Для продолжения нажмите любую клавишу. Чтобы завершить работу, нажмите 0: ");
+                Console.Write("\nДля продолжения нажмите любую клавишу. Чтобы завершить работу, нажмите 0: ");
             } while (Console.ReadLine() != "0");
         }
 
@@ -55,7 +45,7 @@ namespace ConsoleSearchAlbums
             // Создаём объект WebClient
             using (var webClient = new WebClient())
             {
-                webClient.Encoding = Encoding.Unicode;
+                webClient.Encoding = Encoding.UTF8;
                 if (!string.IsNullOrWhiteSpace(search))
                 {
                     webClient.QueryString.Add("q", search.Replace(" ","+"));
