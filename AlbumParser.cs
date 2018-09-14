@@ -2,9 +2,7 @@
 using AngleSharp.Parser.Html;
 using System;
 using System.Collections.Generic;
-using System.Web;
 using System.Linq;
-using AngleSharp.Dom;
 using System.Text.RegularExpressions;
 
 namespace ConsoleSearchAlbums
@@ -12,27 +10,27 @@ namespace ConsoleSearchAlbums
     public class AlbumParser
     {
         private string CssSelectorAlbum;
-        private string CssSelectorMessage = "p.message";
+        private string CssSelectorMessage;
 
-        public AlbumParser()
-            :this(".album-result-heading")
-        { }
-        private AlbumParser(string cssSelectorAlbum)
+        public AlbumParser(string cssSelectorAlbum, string cssSelectorMessageNotFound)
         {
+            if (string.IsNullOrWhiteSpace(cssSelectorAlbum))
+                throw new ArgumentNullException("cssSelectorAlbum");
             CssSelectorAlbum = cssSelectorAlbum;
+            CssSelectorMessage = cssSelectorMessageNotFound;
         }
 
         public IEnumerable<string> Search(string response)
         {
             var parser = new HtmlParser();
             var document = parser.Parse(response);
-
             var artistResult = ExtractResult(document, CssSelectorAlbum);
 
             if (artistResult.Count() > 0)
                 return artistResult;
-            else
+            else if (!string.IsNullOrWhiteSpace(CssSelectorMessage))
                 return ExtractResultMessage(document, CssSelectorMessage);
+            else return new string[] { };
         }
 
         private IEnumerable<string> ExtractResult(IHtmlDocument document, string cssSelector)
