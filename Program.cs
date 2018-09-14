@@ -36,13 +36,12 @@ namespace ConsoleSearchAlbums
                     Console.WriteLine(item);
                 }
 
-                Console.Write("\nДля продолжения нажмите любую клавишу. Чтобы завершить работу, нажмите 0: ");
+                Console.Write("\n\nДля продолжения нажмите любую клавишу. Чтобы завершить работу, нажмите 0: ");
             } while (Console.ReadLine() != "0");
         }
 
         private static string Get(string url, string search)
         {
-            // Создаём объект WebClient
             using (var webClient = new WebClient())
             {
                 webClient.Encoding = Encoding.UTF8;
