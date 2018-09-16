@@ -47,7 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Album.cs" />
+    <Compile Include="IAlbum.cs" />
+    <Compile Include="LibraryCash.cs" />
     <Compile Include="AlbumParser.cs" />
+    <Compile Include="LibraryController.cs" />
+    <Compile Include="LibraryRequest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

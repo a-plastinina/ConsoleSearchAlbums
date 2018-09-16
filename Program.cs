@@ -9,8 +9,7 @@ namespace ConsoleSearchAlbums
     {
         static void Main(string[] args)
         {
-            string search, response = string.Empty;
-            IEnumerable<string> albums = null;
+            string search = string.Empty;
 
             // Адрес ресурса, к которому выполняется запрос
             string url = "https://www.last.fm/ru/search/albums"; ;

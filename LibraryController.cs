@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ConsoleSearchAlbums
 {
@@ -13,8 +11,7 @@ namespace ConsoleSearchAlbums
 
         public LibraryController(string url, string search)
         {
-            if (string.IsNullOrWhiteSpace(url))
-                throw new ArgumentNullException("url");
+            
             if (string.IsNullOrWhiteSpace(search))
                 throw new ArgumentNullException("search");
 
@@ -24,11 +21,36 @@ namespace ConsoleSearchAlbums
 
         public IEnumerable<string> OutputResult(string cssSelectorResult, string cssSelectorNotFound)
         {
-            var lib = new LibraryRequest();
-            var response = lib.Get(Url, Search);
+            IEnumerable<IAlbum> albums = null;
+            string message = "";
+            try
+            {
+                var parser = new AlbumParser(cssSelectorResult, cssSelectorNotFound);
+                var response = new LibraryRequest(Url).Get(Search);
 
-            var parser = new AlbumParser(cssSelectorResult, cssSelectorNotFound);
-            return parser.Search(response);
+                albums = parser.Search(response);
+                message = parser.SearchResultMessage();
+
+                var cash = new LibraryCash("albums.xml");
+                cash.Write(albums);
+            }
+            catch (System.Net.WebException)
+            {
+                message = "Чтение данных из кэша";
+                var cash = new LibraryCash("albums.xml");
+                albums = cash.Read(Search);
+
+                if (albums.Count() == 0)
+                    message += "\nАльбомы не найдены";
+            }
+
+            if (!string.IsNullOrWhiteSpace(message))
+                yield return message;
+
+            foreach (var album in albums)
+            {
+                yield return $"{album.Artist} - {album.Name}";
+            }
         }
     }
 }

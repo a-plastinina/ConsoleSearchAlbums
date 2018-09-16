@@ -1,13 +1,19 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Text;
 
 namespace ConsoleSearchAlbums
 {
     public class LibraryRequest
     {
-        public LibraryRequest()
-        { }
-        public string Get(string url, string search)
+        string Url;
+        public LibraryRequest(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentNullException("url");
+            Url = url;
+        }
+        public string Get(string search)
         {
             using (var webClient = new WebClient())
             {
@@ -17,7 +23,7 @@ namespace ConsoleSearchAlbums
                     webClient.QueryString.Add("q", search.Replace(" ", "+"));
                 }
                 // Выполняем запрос по адресу и получаем ответ в виде строки
-                return webClient.DownloadString(url);
+                return webClient.DownloadString(Url);
             }
         }
     }

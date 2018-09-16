@@ -11,6 +11,7 @@ namespace ConsoleSearchAlbums
     {
         private string CssSelectorAlbum;
         private string CssSelectorMessage;
+        private IHtmlDocument Document;
 
         public AlbumParser(string cssSelectorAlbum, string cssSelectorMessageNotFound)
         {
@@ -20,27 +21,25 @@ namespace ConsoleSearchAlbums
             CssSelectorMessage = cssSelectorMessageNotFound;
         }
 
-        public IEnumerable<string> Search(string response)
+        public IEnumerable<IAlbum> Search(string response)
         {
             var parser = new HtmlParser();
-            var document = parser.Parse(response);
-            var artistResult = ExtractResult(document, CssSelectorAlbum);
-
-            if (artistResult.Count() > 0)
-                return artistResult;
-            else if (!string.IsNullOrWhiteSpace(CssSelectorMessage))
-                return ExtractResultMessage(document, CssSelectorMessage);
-            else return new string[] { };
+            Document = parser.Parse(response);
+            return ExtractResult();
         }
 
-        private IEnumerable<string> ExtractResult(IHtmlDocument document, string cssSelector)
+        private IEnumerable<IAlbum> ExtractResult()
         {
-            var artistResult = document.QuerySelectorAll(cssSelector);
+            if (Document == null) throw new NullReferenceException("document");
+
+            var artistResult = Document.QuerySelectorAll(CssSelectorAlbum);
             foreach (var element in artistResult)
             {
-                yield return string.Format("{0} - {1}",
-                    GetTextContent(element.NextElementSibling.TextContent),
-                    GetTextContent(element.TextContent));
+                yield return new Album()
+                {
+                    Artist = GetTextContent(element.NextElementSibling.TextContent),
+                    Name = GetTextContent(element.TextContent)
+                };
             }
         }
 
@@ -49,13 +48,11 @@ namespace ConsoleSearchAlbums
             return new Regex(@"\s{2,}|\n*").Replace(text, "");
         }
 
-        private IEnumerable<string> ExtractResultMessage(IHtmlDocument document, string cssSelector)
+        public string SearchResultMessage()
         {
-            var artistResult = document.QuerySelectorAll(cssSelector);
-            foreach (var element in artistResult)
-            {
-                yield return element.InnerHtml;
-            }
+            if (Document == null) throw new NullReferenceException("document");
+            var result = Document.QuerySelector(CssSelectorMessage);
+            return result == null ? "" : result.InnerHtml;
         }
     }
 }
