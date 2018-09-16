@@ -38,8 +38,8 @@ namespace ConsoleSearchAlbums
         private bool ExistAlbum(XElement root, IAlbum album)
         {
             return root.Elements("albums").Any(
-                a => a.Attribute("artist").Value.ToLower() == album.Artist.ToLower()
-                    && a.Attribute("name").Value.ToLower() == album.Name.ToLower());
+                a => string.Compare(a.Attribute("artist").Value, album.Artist, true) == 0
+                    && string.Compare(a.Attribute("name").Value, album.Name, true) == 0);
         }
 
         private static void AddAlbum(XElement root, IAlbum album)
@@ -61,7 +61,7 @@ namespace ConsoleSearchAlbums
             var xmlDocument = XDocument.Load(FilePathCash);
 
             var searchResult = from a in xmlDocument.Root.Elements("album")
-                               where a.Attribute("artist").Value.ToLower() == nameArtist.Trim().ToLower()
+                               where string.Compare(a.Attribute("artist").Value, nameArtist.Trim(), true) == 0
                                select new Album()
                                {
                                    Artist = a.Attribute("artist").Value,
