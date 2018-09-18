@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace ConsoleSearchAlbums
 {
-    internal class LibraryCash: ILibraryCash
+    public class LibraryCash
     {
-        private string FilePathCash;
+        private readonly string FilePathCash;
+        public XDocument XmlDocument { get; private set; }
 
         public LibraryCash(string filePathCash)
         {
@@ -21,55 +24,63 @@ namespace ConsoleSearchAlbums
         public void Write(IEnumerable<IAlbum> albums)
         {
             bool isNewDocument = !File.Exists(FilePathCash);
-            var xmlDocument = OpenDocument(isNewDocument);
-            var root = xmlDocument.Root;
+            XmlDocument = OpenDocument(isNewDocument);
 
+            var root = XmlDocument.Root;
             foreach (var album in albums)
             {
-                if (isNewDocument)
-                    AddAlbum(root, album);
-                else if (!ExistAlbum(root, album))
-                    AddAlbum(root, album);
+                if (isNewDocument) AddAlbum(root, album);
+                else if (!ExistAlbum(root, album)) AddAlbum(root, album);
                 else continue;
             }
-            xmlDocument.Save(FilePathCash);
+            XmlDocument.Save(FilePathCash);
         }
 
-        private bool ExistAlbum(XElement root, IAlbum album)
+        public bool ExistAlbum(XElement root, IAlbum album)
         {
             return root.Elements("albums").Any(
-                a => string.Compare(a.Attribute("artist").Value, album.Artist, true) == 0
-                    && string.Compare(a.Attribute("name").Value, album.Name, true) == 0);
+                a => a.Attribute("artist").Value.Equals(album.Artist, StringComparison.CurrentCultureIgnoreCase)
+                && a.Attribute("name").Value.Equals(album.Name, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        private static void AddAlbum(XElement root, IAlbum album)
+        public void AddAlbum(XElement root, IAlbum album)
         {
             root.Add(new XElement("album",
                 new XAttribute("artist", album.Artist),
                 new XAttribute("name", album.Name)));
         }
 
-        private XDocument OpenDocument(bool isNewDocument)
+        public XDocument OpenDocument(bool isNewDocument)
         {
-            return isNewDocument
-                    ? new XDocument(new XElement("albums-result"))
-                    : XDocument.Load(FilePathCash);
+            if (isNewDocument) return new XDocument(new XElement("albums-result"));
+            XDocument doc = null;
+            using (var stream = new StreamReader(FilePathCash, Encoding.GetEncoding(1251)))
+            {
+                doc = XDocument.Load(stream);
+                stream.Close();
+            }
+            return doc;
         }
 
         public IEnumerable<IAlbum> Read(string nameArtist)
         {
-            var xmlDocument = XDocument.Load(FilePathCash);
+            try
+            {
+                XmlDocument = OpenDocument(false);
+                if (XmlDocument == null) throw new NullReferenceException("XmlDocument");
+                var regexArtist = new Regex($@"\b{nameArtist}\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-            var searchResult = from a in xmlDocument.Root.Elements("album")
-                               where string.Compare(a.Attribute("artist").Value, nameArtist.Trim(), true) == 0
-                               select new Album()
-                               {
-                                   Artist = a.Attribute("artist").Value,
-                                   Name = a.Attribute("name").Value
-                               };
-
-            foreach (var item in searchResult)
-                yield return item;
+                return from a in XmlDocument.Root.Elements("album")
+                       where regexArtist.IsMatch(a.Attribute("artist").Value)
+                       select new Album()
+                                   {
+                                       Artist = a.Attribute("artist").Value,
+                                       Name = a.Attribute("name").Value
+                                   };
+            }
+            catch (FileNotFoundException ex)
+            { }
+            return new Album[] { };
         }
     }
 }

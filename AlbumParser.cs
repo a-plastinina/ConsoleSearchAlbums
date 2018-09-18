@@ -2,15 +2,14 @@
 using AngleSharp.Parser.Html;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ConsoleSearchAlbums
 {
     public class AlbumParser
     {
-        private string CssSelectorAlbum;
-        private string CssSelectorMessage;
+        private readonly string CssSelectorAlbum;
+        private readonly string CssSelectorMessage;
         private IHtmlDocument Document;
 
         public AlbumParser(string cssSelectorAlbum, string cssSelectorMessageNotFound)

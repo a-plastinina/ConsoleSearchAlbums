@@ -12,11 +12,11 @@ namespace ConsoleSearchAlbums
             string search = string.Empty;
 
             // Адрес ресурса, к которому выполняется запрос
-            string url = "https://www.last.fm/ru/search/albums"; ;
+            string url = "https://www.last.fm/ru/search/albums";
             Console.WriteLine("Добро пожаловать на last.fm.\n");
             do
             {
-                Console.WriteLine("Введите имя исполнителя для поиска альбомов:");
+                Console.Write("Введите имя исполнителя для поиска альбомов:");
                 search = Console.ReadLine();
 
                 Console.WriteLine($"\nРезультат поиска \"{search}\":\n");
@@ -29,7 +29,7 @@ namespace ConsoleSearchAlbums
                     Console.WriteLine(item);
                 }
 
-                Console.Write("\n\nДля продолжения нажмите любую клавишу.\nДля завершения работы, нажмите 0: ");
+                Console.Write("\nДля завершения работы, нажмите 0.\nДля продолжения нажмите любую клавишу: ");
             } while (Console.ReadLine() != "0");
         }
     }
