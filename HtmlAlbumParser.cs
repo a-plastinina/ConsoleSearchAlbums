@@ -6,43 +6,43 @@ using System.Text.RegularExpressions;
 
 namespace ConsoleSearchAlbums
 {
-    public class HtmlAlbumParser
+    public class HtmlAlbumParser: IAlbumParser
     {
         private readonly string CssSelectorAlbum;
         private readonly string CssSelectorMessage;
         private IHtmlDocument Document;
 
-        public readonly bool IsSucceed;
-        public string SearchResultMessage { get; private set; }
-
-        public HtmlAlbumParser(ILibraryWeb library, string cssSelectorAlbum, string cssSelectorMessageNotFound)
+        public HtmlAlbumParser(string cssSelectorAlbum, string cssSelectorMessageNotFound)
         {
             if (string.IsNullOrWhiteSpace(cssSelectorAlbum))
                 throw new ArgumentNullException("cssSelectorAlbum");
 
             CssSelectorAlbum = cssSelectorAlbum;
-            CssSelectorMessage = cssSelectorMessageNotFound;
-
-            var parser = new HtmlParser();
-            if (library.IsSucceed) Document = parser.Parse(library.HtmlResponse);
-            IsSucceed = Document != null;
+            CssSelectorMessage = cssSelectorMessageNotFound;            
         }
 
-        public IEnumerable<IAlbum> GetAlbums()
+        public IEnumerable<IAlbum> GetAlbums(string source)
         {
-            if (!IsSucceed)
+            CreateDocument(source);
+
+            if (Document != null)
             {
-                yield return null;
-            }
-            var artistResult = Document.QuerySelectorAll(CssSelectorAlbum);
-            foreach (var element in artistResult)
-            {
-                yield return new Album()
+                var artistResult = Document.QuerySelectorAll(CssSelectorAlbum);
+                foreach (var element in artistResult)
                 {
-                    Artist = GetTextContent(element.NextElementSibling.TextContent),
-                    Name = GetTextContent(element.TextContent)
-                };
+                    yield return new Album()
+                    {
+                        Artist = GetTextContent(element.NextElementSibling.TextContent),
+                        Name = GetTextContent(element.TextContent)
+                    };
+                }
             }
+        }
+
+        private void CreateDocument(string source)
+        {
+            var parser = new HtmlParser();
+            Document = parser.Parse(source);
         }
 
         private static string GetTextContent(string text)
@@ -50,9 +50,9 @@ namespace ConsoleSearchAlbums
             return new Regex(@"\s{2,}|\n*").Replace(text, "");
         }
 
-        public string ShowMessage()
+        public string GetMessage()
         {
-            if (!IsSucceed)
+            if (Document == null)
                 return "Неверный формат данных: IHtmlDocument.";
             if (string.IsNullOrWhiteSpace(CssSelectorMessage))
                 return string.Empty;

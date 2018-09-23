@@ -24,41 +24,35 @@ namespace ConsoleSearchAlbums
             string message = "";
             string filePathCash = @"..\..\albums.xml";
 
-            // сайт выполняет поиск и среди наименований альбомов
-            // среди артистов выдает результат Rianna => Rihanna 
-            var webLib = new LibraryWeb(Url);
-            webLib.Read(Search);
-
-            if (webLib.IsSucceed)
+            try
             {
-                var parser = new HtmlAlbumParser(webLib, cssSelectorResult, cssSelectorNotFound);
+                var context = new LibraryContext(Url, cssSelectorResult, cssSelectorNotFound);
+                albums = context.Get(Search);
+                message = context.GetMessage();
 
-                if (parser.IsSucceed)
+                if (context.IsSucceed)
                 {
-                    albums = parser.GetAlbums();
-
-                    if (albums != null && albums.Count() != 0)
-                    {
-                        var cash = new LibraryCash(filePathCash);
-                        cash.Write(albums);
-                    }
+                    var cashLibrary = new CashLibrary(filePathCash);
+                    cashLibrary.Write(albums);
                 }
-                message = parser.ShowMessage();
+                else
+                {
+                    context.ChangeRequest(new CashLibrary(filePathCash));
+                    albums = context.Get(Search);
+                    message = context.GetMessage();
+                }                
             }
-            else
+            catch (Exception e)
             {
-                message = "Заданный узел не отвечает. Чтение данных из кэша.\n";
-
-                var cash = new LibraryCash(filePathCash);
-                albums = cash.Read(Search);
-
-                if (albums.Count() == 0)
-                    message += "\nАльбомы не найдены";
+                message = e.Message;
             }
-
+            return Output(message, albums);
+        }
+        private IEnumerable<string> Output(string message, IEnumerable<IAlbum> albums)
+        {
             if (!string.IsNullOrWhiteSpace(message))
                 yield return message;
-
+            
             if (albums != null)
                 foreach (var album in albums)
                 {

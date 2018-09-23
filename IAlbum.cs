@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace ConsoleSearchAlbums
 {
@@ -9,19 +10,9 @@ namespace ConsoleSearchAlbums
         bool Equals(string artist, string name);
     }
 
-    public interface ILibraryRequest
+    public interface IAlbumParser
     {
-        bool IsSucceed { get; }
-        void Read(string search);
-    }
-
-    public interface ILibraryWeb : ILibraryRequest
-    {
-        string HtmlResponse { get; }
-    }
-
-    public interface ILibraryCash : ILibraryRequest
-    {
-        XDocument XmlDocument { get; }
+        IEnumerable<IAlbum> GetAlbums(string source);
+        string GetMessage();
     }
 }
