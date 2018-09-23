@@ -20,7 +20,7 @@ namespace ConsoleSearchAlbums
                 search = Console.ReadLine();
 
                 Console.WriteLine($"\nРезультат поиска \"{search}\":\n");
-
+                
                 var controller = new LibraryController(url, search);
                 var results = controller.OutputResult(".album-result-heading", "p.message");
 
@@ -28,7 +28,7 @@ namespace ConsoleSearchAlbums
                 {
                     Console.WriteLine(item);
                 }
-
+                
                 Console.Write("\nДля завершения работы, нажмите 0.\nДля продолжения нажмите любую клавишу: ");
             } while (Console.ReadLine() != "0");
         }

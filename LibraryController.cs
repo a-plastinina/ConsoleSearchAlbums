@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Configuration;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleSearchAlbums
 {
@@ -25,22 +23,31 @@ namespace ConsoleSearchAlbums
             IEnumerable<IAlbum> albums = null;
             string message = "";
             string filePathCash = @"..\..\albums.xml";
-            try
-            {
-                var parser = new AlbumParser(cssSelectorResult, cssSelectorNotFound);
-                var response = new LibraryRequest(Url).Get(Search);
 
-                // сайт выполняет поиск и среди наименований альбомов
-                // но среди артистов выдает результат Rianna => Rihanna 
-                albums = parser.Search(response);
-                message = parser.SearchResultMessage();
-                
-                var cash = new LibraryCash(filePathCash);
-                cash.Write(albums);
-            }
-            catch (System.Net.WebException)
+            // сайт выполняет поиск и среди наименований альбомов
+            // среди артистов выдает результат Rianna => Rihanna 
+            var webLib = new LibraryWeb(Url);
+            webLib.Read(Search);
+
+            if (webLib.IsSucceed)
             {
-                message = "Чтение данных из кэша";
+                var parser = new HtmlAlbumParser(webLib, cssSelectorResult, cssSelectorNotFound);
+
+                if (parser.IsSucceed)
+                {
+                    albums = parser.GetAlbums();
+
+                    if (albums != null && albums.Count() != 0)
+                    {
+                        var cash = new LibraryCash(filePathCash);
+                        cash.Write(albums);
+                    }
+                }
+                message = parser.ShowMessage();
+            }
+            else
+            {
+                message = "Заданный узел не отвечает. Чтение данных из кэша.\n";
 
                 var cash = new LibraryCash(filePathCash);
                 albums = cash.Read(Search);
@@ -52,10 +59,11 @@ namespace ConsoleSearchAlbums
             if (!string.IsNullOrWhiteSpace(message))
                 yield return message;
 
-            foreach (var album in albums)
-            {
-                yield return $"{album.Artist} - {album.Name}";
-            }
+            if (albums != null)
+                foreach (var album in albums)
+                {
+                    yield return album.ToString();
+                }
         }
     }
 }

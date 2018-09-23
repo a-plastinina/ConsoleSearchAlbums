@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace ConsoleSearchAlbums
 {
-    public class LibraryCash
+    public class LibraryCash : ILibraryCash
     {
         private readonly string FilePathCash;
         public XDocument XmlDocument { get; private set; }
@@ -24,7 +24,9 @@ namespace ConsoleSearchAlbums
         public void Write(IEnumerable<IAlbum> albums)
         {
             bool isNewDocument = !File.Exists(FilePathCash);
-            XmlDocument = OpenDocument(isNewDocument);
+
+            if (isNewDocument) CreateDocument();
+            else OpenDocument();
 
             var root = XmlDocument.Root;
             foreach (var album in albums)
@@ -38,9 +40,8 @@ namespace ConsoleSearchAlbums
 
         public bool ExistAlbum(XElement root, IAlbum album)
         {
-            return root.Elements("albums").Any(
-                a => a.Attribute("artist").Value.Equals(album.Artist, StringComparison.CurrentCultureIgnoreCase)
-                && a.Attribute("name").Value.Equals(album.Name, StringComparison.CurrentCultureIgnoreCase));
+            return root.Elements("album").Any(
+                a => album.Equals(a.Attribute("artist").Value, a.Attribute("name").Value));
         }
 
         public void AddAlbum(XElement root, IAlbum album)
@@ -50,35 +51,36 @@ namespace ConsoleSearchAlbums
                 new XAttribute("name", album.Name)));
         }
 
-        public XDocument OpenDocument(bool isNewDocument)
+        private void CreateDocument()
         {
-            if (isNewDocument) return new XDocument(new XElement("albums-result"));
-            XDocument doc = null;
+            XmlDocument = new XDocument(new XElement("albums-result"));
+        }
+
+        private void OpenDocument()
+        {
             using (var stream = new StreamReader(FilePathCash, Encoding.GetEncoding(1251)))
             {
-                doc = XDocument.Load(stream);
+                XmlDocument = XDocument.Load(stream);
                 stream.Close();
             }
-            return doc;
         }
 
         public IEnumerable<IAlbum> Read(string nameArtist)
         {
             try
             {
-                XmlDocument = OpenDocument(false);
-                if (XmlDocument == null) throw new NullReferenceException("XmlDocument");
+                OpenDocument();
                 var regexArtist = new Regex($@"\b{nameArtist}\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                 return from a in XmlDocument.Root.Elements("album")
                        where regexArtist.IsMatch(a.Attribute("artist").Value)
                        select new Album()
-                                   {
-                                       Artist = a.Attribute("artist").Value,
-                                       Name = a.Attribute("name").Value
-                                   };
+                       {
+                           Artist = a.Attribute("artist").Value,
+                           Name = a.Attribute("name").Value
+                       };
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             { }
             return new Album[] { };
         }

@@ -4,26 +4,46 @@ using System.Text;
 
 namespace ConsoleSearchAlbums
 {
-    public class LibraryRequest
+    public class LibraryWeb : ILibraryWeb
     {
-        string Url;
-        public LibraryRequest(string url)
+        readonly string Url;
+        static WebClient client;
+
+        private void CreateWebClient()
         {
-            if (string.IsNullOrWhiteSpace(url))
-                throw new ArgumentNullException("url");
-            Url = url;
-        }
-        public string Get(string search)
-        {
-            using (var webClient = new WebClient())
+            if (client == null)
             {
-                webClient.Encoding = Encoding.UTF8;
-                if (!string.IsNullOrWhiteSpace(search))
+                client = new WebClient
                 {
-                    webClient.QueryString.Add("q", search.Replace(" ", "+"));
-                }
-                // Выполняем запрос по адресу и получаем ответ в виде строки
-                return webClient.DownloadString(Url);
+                    Encoding = Encoding.UTF8
+                };
+            }
+            client.QueryString.Clear();
+        }
+
+        public LibraryWeb(string url)
+        {
+            if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
+            Url = url;
+
+            CreateWebClient();
+        }
+
+        public bool IsSucceed { get; private set; }
+
+        public string HtmlResponse { get; private set; }
+
+        public void Read(string search)
+        {
+            try
+            { 
+                client.QueryString.Add("q", search.Replace(" ", "+"));
+                HtmlResponse = client.DownloadString(Url);
+                IsSucceed = true;
+            }
+            catch (Exception)
+            {
+                IsSucceed = false;
             }
         }
     }
