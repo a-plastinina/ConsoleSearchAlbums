@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace ConsoleSearchAlbums
 {
-    internal class CashLibrary : IStateRequest
+    public class CashLibrary : IStateRequest
     {
         string PathXmlFile;
         XDocument XmlDocument;

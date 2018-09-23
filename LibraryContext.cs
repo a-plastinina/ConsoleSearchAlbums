@@ -10,9 +10,9 @@ namespace ConsoleSearchAlbums
     {
         IStateRequest State;
 
-        public LibraryContext(string url, string cssSelectorResult, string cssSelectorNotFound)
+        public LibraryContext(string url, string cssSeelctorArtist, string cssSelectorResult)
         {
-            State = new WebLibrary(url, new HtmlAlbumParser(cssSelectorResult, cssSelectorNotFound));
+            State = new WebLibrary(url, new HtmlAlbumParser(cssSeelctorArtist, cssSelectorResult));
         }
 
         public void ChangeRequest(IStateRequest state)

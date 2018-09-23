@@ -18,7 +18,7 @@ namespace ConsoleSearchAlbums
             Search = search;
         }
 
-        public IEnumerable<string> OutputResult(string cssSelectorResult, string cssSelectorNotFound)
+        public IEnumerable<string> OutputResult(string cssSelectorArtist, string cssSelectorResult)
         {
             IEnumerable<IAlbum> albums = null;
             string message = "";
@@ -26,7 +26,7 @@ namespace ConsoleSearchAlbums
 
             try
             {
-                var context = new LibraryContext(Url, cssSelectorResult, cssSelectorNotFound);
+                var context = new LibraryContext(Url, cssSelectorArtist, cssSelectorResult);
                 albums = context.Get(Search);
                 message = context.GetMessage();
 

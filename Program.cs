@@ -9,7 +9,7 @@ namespace ConsoleSearchAlbums
             string search = string.Empty;
 
             // Адрес ресурса, к которому выполняется запрос
-            string url = "https://www.last.fm/ru/search/albums";
+            string url = "https://www.last.fm/ru/music/{0}/+albums";
             Console.WriteLine("Добро пожаловать на LAST.FM\n");
             do
             {
@@ -25,7 +25,7 @@ namespace ConsoleSearchAlbums
                     Console.WriteLine($"\nРезультат поиска \"{search}\":\n");
 
                     var controller = new LibraryController(url, search);
-                    var results = controller.OutputResult(".album-result-heading", "p.message");
+                    var results = controller.OutputResult(".header-title a", ".album-grid-item-title a");
 
                     foreach (var item in results)
                     {

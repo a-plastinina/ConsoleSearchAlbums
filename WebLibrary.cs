@@ -23,7 +23,6 @@ namespace ConsoleSearchAlbums
                     Encoding = Encoding.UTF8
                 };
             }
-            client.QueryString.Clear();
         }
 
         public WebLibrary(string url, IAlbumParser parser)
@@ -40,8 +39,7 @@ namespace ConsoleSearchAlbums
         {
             try
             {
-                client.QueryString.Add("q", artist.Replace(" ", "+"));
-                var response = client.DownloadString(Url);
+                var response = client.DownloadString(string.Format(Url, artist.Replace(" ", "+")));
                 IsSucceed = true;
 
                 Parser.CreateDocument(response);
