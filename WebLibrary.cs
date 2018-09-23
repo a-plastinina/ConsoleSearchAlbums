@@ -44,7 +44,8 @@ namespace ConsoleSearchAlbums
                 var response = client.DownloadString(Url);
                 IsSucceed = true;
 
-                return Parser.GetAlbums(response);
+                Parser.CreateDocument(response);
+                return Parser.GetAlbums();
             }
             catch (Exception)
             {

@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Album.cs" />
     <Compile Include="CashLibrary.cs" />
+    <Compile Include="IAlbumParser.cs" />
     <Compile Include="IAlbum.cs" />
     <Compile Include="IStateRequest.cs" />
     <Compile Include="HtmlAlbumParser.cs" />

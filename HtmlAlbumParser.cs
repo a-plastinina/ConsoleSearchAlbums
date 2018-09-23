@@ -21,10 +21,8 @@ namespace ConsoleSearchAlbums
             CssSelectorMessage = cssSelectorMessageNotFound;            
         }
 
-        public IEnumerable<IAlbum> GetAlbums(string source)
+        public IEnumerable<IAlbum> GetAlbums()
         {
-            CreateDocument(source);
-
             if (Document != null)
             {
                 var artistResult = Document.QuerySelectorAll(CssSelectorAlbum);
@@ -39,7 +37,7 @@ namespace ConsoleSearchAlbums
             }
         }
 
-        private void CreateDocument(string source)
+        public void CreateDocument(string source)
         {
             var parser = new HtmlParser();
             Document = parser.Parse(source);
