@@ -18,7 +18,7 @@ namespace ConsoleSearchAlbums
         {
             if (client == null)
             {
-                client = new WebClient
+                client = new WebClient()
                 {
                     Encoding = Encoding.UTF8
                 };
@@ -53,7 +53,7 @@ namespace ConsoleSearchAlbums
         }
         public string GetMessage()
         {
-            return IsSucceed ? Parser.GetMessage() : string.Empty;
+            return IsSucceed ? Parser.GetMessage() : "Нет подключения к Интернет. ";
         }
     }
 }

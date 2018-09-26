@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ConsoleSearchAlbums
 {
@@ -31,6 +30,7 @@ namespace ConsoleSearchAlbums
             {
                 var context = new LibraryContext(Url, Selector);
                 albums = context.Get(search);
+                message = context.GetMessage();
 
                 if (context.IsSucceed)
                 {
@@ -41,8 +41,8 @@ namespace ConsoleSearchAlbums
                 {
                     context.ChangeRequest(new CashLibrary(filePathCash));
                     albums = context.Get(search);
+                    message += context.GetMessage();
                 }
-                message = context.GetMessage();
             }
             catch (Exception e)
             {

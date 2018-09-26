@@ -29,8 +29,8 @@ namespace ConsoleSearchAlbums
 
         public string GetMessage()
         {
-            var result = IsSucceed ? State.GetMessage() : string.Empty;
-            if (CountAlbums == 0) result += "\nАльбомы не найдены";
+            var result = State.GetMessage();
+            if (IsSucceed && CountAlbums == 0) result += "\nАльбомы не найдены";
             return result;
         }
     }

@@ -39,7 +39,7 @@ namespace ConsoleSearchAlbums
 
         public string GetMessage()
         {
-            return "Нет подключения к Интернет. Чтение данных из кэша.";
+            return "Чтение данных из кэша.";
         }
 
         public void Write(IEnumerable<IAlbum> albums)

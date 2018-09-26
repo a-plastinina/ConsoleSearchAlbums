@@ -34,8 +34,8 @@ namespace ConsoleSearchAlbums
                 {
                     yield return new Album()
                     {
-                        Artist = GetTextContent(artistNameElement.TextContent),
-                        Name = GetTextContent(element.TextContent)
+                        Artist = GetValue(artistNameElement.TextContent),
+                        Name = GetValue(element.TextContent)
                     };
                 }
             }
@@ -45,12 +45,12 @@ namespace ConsoleSearchAlbums
         {
             if (string.IsNullOrWhiteSpace(source))
                 throw new NullReferenceException("source");
-            var 
-                parser = new HtmlParser();
+
+            var parser = new HtmlParser();
             Document = parser.Parse(source);
         }
 
-        private static string GetTextContent(string text)
+        private static string GetValue(string text)
         {
             return new Regex(@"\s{2,}|\n*").Replace(text, "");
         }
