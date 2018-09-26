@@ -6,29 +6,31 @@ namespace ConsoleSearchAlbums
 {
     public class LibraryController
     {
+        readonly CssSelector Selector;
         readonly string Url;
-        readonly string Search;
 
-        public LibraryController(string url, string search)
+        public LibraryController(string url, CssSelector selector)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                throw new ArgumentNullException("url");
+            Url = url.Trim();
+
+            Selector = selector ?? throw new ArgumentNullException("selector");
+        }
+
+        public IEnumerable<string> OutputResult(string search)
         {
             if (string.IsNullOrWhiteSpace(search))
                 throw new ArgumentNullException("search");
 
-            Url = url.Trim();
-            Search = search;
-        }
-
-        public IEnumerable<string> OutputResult(string cssSelectorArtist, string cssSelectorResult)
-        {
             IEnumerable<IAlbum> albums = null;
             string message = "";
             string filePathCash = @"..\..\albums.xml";
 
             try
             {
-                var context = new LibraryContext(Url, cssSelectorArtist, cssSelectorResult);
-                albums = context.Get(Search);
-                message = context.GetMessage();
+                var context = new LibraryContext(Url, Selector);
+                albums = context.Get(search);
 
                 if (context.IsSucceed)
                 {
@@ -38,17 +40,17 @@ namespace ConsoleSearchAlbums
                 else
                 {
                     context.ChangeRequest(new CashLibrary(filePathCash));
-                    albums = context.Get(Search);
-                    message = context.GetMessage();
-                }                
+                    albums = context.Get(search);
+                }
+                message = context.GetMessage();
             }
             catch (Exception e)
             {
                 message = e.Message;
             }
-            return Output(message, albums);
+            return ResultEnumerable(message, albums);
         }
-        private IEnumerable<string> Output(string message, IEnumerable<IAlbum> albums)
+        private IEnumerable<string> ResultEnumerable(string message, IEnumerable<IAlbum> albums)
         {
             if (!string.IsNullOrWhiteSpace(message))
                 yield return message;

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleSearchAlbums
 {
@@ -10,9 +7,9 @@ namespace ConsoleSearchAlbums
     {
         IStateRequest State;
 
-        public LibraryContext(string url, string cssSeelctorArtist, string cssSelectorResult)
+        public LibraryContext(string url, CssSelector cssSelector)
         {
-            State = new WebLibrary(url, new HtmlAlbumParser(cssSeelctorArtist, cssSelectorResult));
+            State = new WebLibrary(url, new HtmlAlbumParser(cssSelector));
         }
 
         public void ChangeRequest(IStateRequest state)
@@ -23,14 +20,18 @@ namespace ConsoleSearchAlbums
         public IEnumerable<IAlbum> Get(string artist)
         {
             var albums = State.GetAlbums(artist);
+            CountAlbums = albums != null ? albums.Count() : 0;
             return albums;
         }
 
+        private int CountAlbums = 0;
         public bool IsSucceed { get { return State.IsSucceed; } }
 
         public string GetMessage()
         {
-            return State.GetMessage();
+            var result = IsSucceed ? State.GetMessage() : string.Empty;
+            if (CountAlbums == 0) result += "\nАльбомы не найдены";
+            return result;
         }
     }
 }

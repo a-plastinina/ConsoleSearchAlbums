@@ -39,11 +39,13 @@ namespace ConsoleSearchAlbums
 
         public string GetMessage()
         {
-            return "Чтение данных из кэша.";
+            return "Нет подключения к Интернет. Чтение данных из кэша.";
         }
 
         public void Write(IEnumerable<IAlbum> albums)
         {
+            if (albums.Count() == 0) return;
+
             bool isNewDocument = !File.Exists(PathXmlFile);
 
             if (isNewDocument) CreateDocument();

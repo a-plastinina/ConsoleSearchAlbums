@@ -10,23 +10,25 @@ namespace ConsoleSearchAlbums
 
             // Адрес ресурса, к которому выполняется запрос
             string url = "https://www.last.fm/ru/music/{0}/+albums";
+
+            var cssSelector = new CssSelector()
+            {
+                ArtistElement = ".header-title a",
+                AlbumElement = ".album-grid-item-title a"
+            };
+
             Console.WriteLine("Добро пожаловать на LAST.FM\n");
+            var controller = new LibraryController(url, cssSelector);
+
             do
             {
                 try
                 {
-                    do
-                    {
-                        Console.Write("Введите имя исполнителя для поиска альбомов: ");
-                        search = Console.ReadLine();
-                    }
-                    while (string.IsNullOrWhiteSpace(search));
+                    search = GetArtistNameForSearch();
 
                     Console.WriteLine($"\nРезультат поиска \"{search}\":\n");
 
-                    var controller = new LibraryController(url, search);
-                    var results = controller.OutputResult(".header-title a", ".album-grid-item-title a");
-
+                    var results = controller.OutputResult(search);
                     foreach (var item in results)
                     {
                         Console.WriteLine(item);
@@ -38,9 +40,25 @@ namespace ConsoleSearchAlbums
                 {
                     Console.WriteLine(e.Message);
                 }
-            } while (Console.ReadLine() != "0");
+            } while (IsFinish());
 
         }
 
+        private static bool IsFinish()
+        {
+            return Console.ReadLine() != "0";
+        }
+
+        private static string GetArtistNameForSearch()
+        {
+            string search=string.Empty;
+            do
+            {
+                Console.Write("Введите имя исполнителя для поиска альбомов: ");
+                search = Console.ReadLine();
+            }
+            while (string.IsNullOrWhiteSpace(search));
+            return search;
+        }
     }
 }

@@ -8,28 +8,29 @@ namespace ConsoleSearchAlbums
 {
     public class HtmlAlbumParser: IAlbumParser
     {
-        private readonly string CssSelectorAlbum;
-        private readonly string CssSelectorArtist;
+        readonly CssSelector SelectorElement;
         private IHtmlDocument Document;
 
-        public HtmlAlbumParser(string cssSelectorArtist, string cssSelectorAlbum)
+        public HtmlAlbumParser(CssSelector cssSelector)
         {
-            if (string.IsNullOrWhiteSpace(cssSelectorAlbum))
-                throw new ArgumentNullException("cssSelectorAlbum");
-            if (string.IsNullOrWhiteSpace(cssSelectorArtist))
+            if (cssSelector == null)
+                throw new ArgumentNullException("cssSelector");
+            if (string.IsNullOrWhiteSpace(cssSelector.AlbumElement))
+                throw new ArgumentNullException("cssSelector.AlbumElement");
+            if (string.IsNullOrWhiteSpace(cssSelector.ArtistElement))
                 throw new ArgumentNullException("cssSelectorArtist");
 
-            CssSelectorAlbum = cssSelectorAlbum;
-            CssSelectorArtist = cssSelectorArtist;            
+            SelectorElement = cssSelector;
         }
 
         public IEnumerable<IAlbum> GetAlbums()
         {
             if (Document != null)
             {
-                var artistNameElement = Document.QuerySelector(CssSelectorArtist);
-                var artistResult = Document.QuerySelectorAll(CssSelectorAlbum);
-                foreach (var element in artistResult)
+                var artistNameElement = Document.QuerySelector(SelectorElement.ArtistElement);
+                var albumElements = Document.QuerySelectorAll(SelectorElement.AlbumElement);
+                
+                foreach (var element in albumElements)
                 {
                     yield return new Album()
                     {
@@ -42,7 +43,10 @@ namespace ConsoleSearchAlbums
 
         public void CreateDocument(string source)
         {
-            var parser = new HtmlParser();
+            if (string.IsNullOrWhiteSpace(source))
+                throw new NullReferenceException("source");
+            var 
+                parser = new HtmlParser();
             Document = parser.Parse(source);
         }
 
