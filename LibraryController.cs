@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleSearchAlbums
 {
     public class LibraryController
     {
-        readonly CssSelector Selector;
-        readonly string Url;
+        readonly ILibraryRequest CashLibrary;
+        readonly string FilePathCash = @"..\..\albums.xml";
 
         public LibraryController(string url, CssSelector selector)
         {
+            var webLibrary = CreateWebLibrary(url, selector);
+            CashLibrary = new CashXmlLibrary(webLibrary, new XmlAlbumParser(FilePathCash));
+        }
+
+        private ILibraryRequest CreateWebLibrary(string url, CssSelector selector)
+        {
             if (string.IsNullOrWhiteSpace(url))
                 throw new ArgumentNullException("url");
-            Url = url.Trim();
-
-            Selector = selector ?? throw new ArgumentNullException("selector");
+            return new WebLibrary(url.Trim(), new HtmlAlbumParser(selector));
         }
 
         public IEnumerable<string> OutputResult(string search)
@@ -24,25 +29,12 @@ namespace ConsoleSearchAlbums
 
             IEnumerable<IAlbum> albums = null;
             string message = "";
-            string filePathCash = @"..\..\albums.xml";
 
             try
             {
-                var context = new LibraryContext(Url, Selector);
-                albums = context.Get(search);
-                message = context.GetMessage();
-
-                if (context.IsSucceed)
-                {
-                    var cashLibrary = new CashLibrary(filePathCash);
-                    cashLibrary.Write(albums);
-                }
-                else
-                {
-                    context.ChangeRequest(new CashLibrary(filePathCash));
-                    albums = context.Get(search);
-                    message += context.GetMessage();
-                }
+                albums = CashLibrary.GetAlbums(search);
+                message = CashLibrary.GetMessage();
+                if (albums.Count() == 0) message += " Альбомы не найдены.";
             }
             catch (Exception e)
             {

@@ -11,6 +11,7 @@ namespace ConsoleSearchAlbums
             // Адрес ресурса, к которому выполняется запрос
             string url = "https://www.last.fm/ru/music/{0}/+albums";
 
+            // селектор для поиска в ответе
             var cssSelector = new CssSelector()
             {
                 ArtistElement = ".header-title a",

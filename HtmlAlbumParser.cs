@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace ConsoleSearchAlbums
 {
-    public class HtmlAlbumParser: IAlbumParser
+    public class HtmlAlbumParser
     {
         readonly CssSelector SelectorElement;
         private IHtmlDocument Document;

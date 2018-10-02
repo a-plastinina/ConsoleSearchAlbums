@@ -36,9 +36,6 @@
     <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>packages\AngleSharp.0.9.10\lib\net45\AngleSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -54,16 +51,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Album.cs" />
-    <Compile Include="CashLibrary.cs" />
+    <Compile Include="CashXmlLibrary.cs" />
+    <Compile Include="CssSelector.cs" />
     <Compile Include="IAlbumParser.cs" />
     <Compile Include="IAlbum.cs" />
-    <Compile Include="IStateRequest.cs" />
+    <Compile Include="ILibraryRequest.cs" />
     <Compile Include="HtmlAlbumParser.cs" />
-    <Compile Include="LibraryContext.cs" />
     <Compile Include="LibraryController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebLibrary.cs" />
+    <Compile Include="XmlAlbumParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -5,14 +5,14 @@ using System.Text;
 
 namespace ConsoleSearchAlbums
 {
-    internal class WebLibrary : IStateRequest
+    internal class WebLibrary : ILibraryRequest
     {
         readonly string Url;
-        readonly IAlbumParser Parser;
+        readonly HtmlAlbumParser Parser;
 
         public bool IsSucceed { get; private set; }
         
-        public WebLibrary(string url, IAlbumParser parser)
+        public WebLibrary(string url, HtmlAlbumParser parser)
         {
             if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
             Url = url;
@@ -35,7 +35,7 @@ namespace ConsoleSearchAlbums
                     return Parser.GetAlbums();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 IsSucceed = false;
                 return null;
