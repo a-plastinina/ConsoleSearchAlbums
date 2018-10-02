@@ -29,7 +29,7 @@ namespace ConsoleSearchAlbums
             {
                 var artistNameElement = Document.QuerySelector(SelectorElement.ArtistElement);
                 var albumElements = Document.QuerySelectorAll(SelectorElement.AlbumElement);
-                
+                                    
                 foreach (var element in albumElements)
                 {
                     yield return new Album()
@@ -52,7 +52,7 @@ namespace ConsoleSearchAlbums
 
         private static string GetValue(string text)
         {
-            return new Regex(@"\s{2,}|\n*").Replace(text, "");
+            return new Regex(@"\s{2,}|\n*").Replace(text, "").Trim();
         }
 
         public string GetMessage()

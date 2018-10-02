@@ -10,40 +10,30 @@ namespace ConsoleSearchAlbums
         readonly string Url;
         readonly IAlbumParser Parser;
 
-        static WebClient client;
-
         public bool IsSucceed { get; private set; }
-
-        private void CreateWebClient()
-        {
-            if (client == null)
-            {
-                client = new WebClient()
-                {
-                    Encoding = Encoding.UTF8
-                };
-            }
-        }
-
+        
         public WebLibrary(string url, IAlbumParser parser)
         {
             if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("url");
             Url = url;
 
             Parser = parser ?? throw new ArgumentNullException("parser");
-
-            CreateWebClient();
         }
 
         public IEnumerable<IAlbum> GetAlbums(string artist)
         {
             try
             {
-                var response = client.DownloadString(string.Format(Url, artist.Replace(" ", "+")));
-                IsSucceed = true;
+                using (var client = new WebClient())
+                {
+                    client.Encoding = Encoding.UTF8;
 
-                Parser.CreateDocument(response);
-                return Parser.GetAlbums();
+                    var response = client.DownloadString(string.Format(Url, artist.Replace(" ", "+")));
+                    IsSucceed = true;
+
+                    Parser.CreateDocument(response);
+                    return Parser.GetAlbums();
+                }
             }
             catch (Exception)
             {
@@ -53,7 +43,7 @@ namespace ConsoleSearchAlbums
         }
         public string GetMessage()
         {
-            return IsSucceed ? Parser.GetMessage() : "Нет подключения к Интернет. ";
+            return IsSucceed ? Parser.GetMessage() : "Заданный узел не доступен. ";
         }
     }
 }

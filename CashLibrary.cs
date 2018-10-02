@@ -69,6 +69,8 @@ namespace ConsoleSearchAlbums
         public void OpenDocument()
         {
             IsSucceed = File.Exists(PathXmlFile);
+            if (!IsSucceed) return;
+
             try
             {
                 using (var stream = new StreamReader(PathXmlFile, Encoding.GetEncoding(1251)))
